@@ -5,7 +5,8 @@ afterAll(() => pool.end());
 
 async function project(c: Ctx, as: Person, name = "Taco Bell – Diablo Maple") {
   await c.as(as);
-  const { create_project: id } = await c.one(`select create_project($1)`, [name]);
+  // Unique per test so existing (e.g. demo) data never leaks into assertions.
+  const { create_project: id } = await c.one(`select create_project($1)`, [`${name} ${Math.random().toString(36).slice(2, 8)}`]);
   return id as string;
 }
 const entries = (rows: [string, number][]) => JSON.stringify(rows.map(([work_date, hours]) => ({ work_date, hours })));

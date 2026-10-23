@@ -93,7 +93,7 @@ describe("employee privacy (RLS + RPC authorization)", () => {
       await c.q(`select review_time_off($1, 'approved')`, [approvedId]);
 
       await c.as(alice);
-      const rows = await c.q(`select * from team_calendar('2026-11-01', '2026-11-30')`);
+      const rows = (await c.q(`select * from team_calendar('2026-11-01', '2026-11-30')`)).filter((r) => r.employee_id === bob.id);
       expect(rows.length).toBe(2); // only the approved request; pending is hidden from peers
       for (const r of rows) {
         expect(r.full_name).toBe("Bob Employee");
@@ -105,7 +105,7 @@ describe("employee privacy (RLS + RPC authorization)", () => {
 
       // Bob's approver sees type and pending requests.
       await c.as(manager);
-      const mgrRows = await c.q(`select * from team_calendar('2026-11-01', '2026-11-30')`);
+      const mgrRows = (await c.q(`select * from team_calendar('2026-11-01', '2026-11-30')`)).filter((r) => r.employee_id === bob.id);
       expect(mgrRows.length).toBe(3);
       expect(mgrRows.every((r) => r.kind === "vacation")).toBe(true);
     });
@@ -138,7 +138,8 @@ describe("employee privacy (RLS + RPC authorization)", () => {
       const owner = await c.addEmployee(admin, { name: "Olive Owner", role: "people_admin" });
       const admin2 = await c.addEmployee(admin, { name: "Ana Admin2", role: "people_admin", manager_id: owner.id, opening_vacation: 10 });
       await c.as(admin);
-      const count = await c.one(`select count(*)::int as n from employee_profiles`);
+      const ids = [admin, alice, bob, carol, manager, owner, admin2].map((p) => p.id);
+      const count = await c.one(`select count(*)::int as n from employee_profiles where id = any($1)`, [ids]);
       expect(count.n).toBe(7);
       const rows = await c.q(`select * from admin_employee_table()`);
       expect(rows.find((r) => r.id === bob.id).annual_days).toBe(20);

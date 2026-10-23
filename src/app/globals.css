@@ -1,26 +1,53 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --color-canvas: #f7f6f3;
+  --color-surface: #ffffff;
+  --color-line: #e9e6e0;
+  --color-line-strong: #d9d5cd;
+  --color-ink: #1d1c1a;
+  --color-ink-soft: #46443f;
+  --color-muted: #77736b;
+
+  --color-accent: #ff5a1f;
+  --color-accent-strong: #e84a12;
+  --color-accent-soft: #fff1ea;
+
+  --color-vacation: #0e9f95;
+  --color-vacation-soft: #e3f6f3;
+  --color-lieu: #7357ff;
+  --color-lieu-soft: #efebff;
+  --color-holiday: #c98a04;
+  --color-holiday-soft: #fdf4dc;
+
+  --color-ok: #16a34a;
+  --color-ok-soft: #e8f7ee;
+  --color-warn: #b45309;
+  --color-warn-soft: #fef3e2;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fdecec;
+
+  --radius-xl: 0.875rem;
+  --radius-2xl: 1.125rem;
+  --shadow-card: 0 1px 2px rgb(29 28 26 / 0.04), 0 1px 1px rgb(29 28 26 / 0.03);
+  --shadow-pop: 0 10px 30px -10px rgb(29 28 26 / 0.18);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+html { color-scheme: light; }
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
+
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.55; cursor: pointer; }
+
+@utility tabular { font-variant-numeric: tabular-nums; }
+
+/* Grid items may shrink below their content (wide tables scroll inside instead of widening the page). */
+.grid > * { min-width: 0; }

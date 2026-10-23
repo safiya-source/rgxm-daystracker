@@ -236,17 +236,16 @@ begin
   return query
   select * from (
     select t.created_at, 'vacation'::text,
-           case t.txn_type when 'usage' then 'Vacation approved' when 'usage_reversal' then 'Vacation cancelled'
-             when 'adjustment' then 'Vacation balance adjusted' when 'allocation' then 'Vacation allocated'
-             when 'accrual' then 'Vacation accrued' when 'carryover_forfeit' then 'Carryover above cap'
-             else 'Opening vacation balance' end || coalesce(': ' || t.reason, ''),
+           case t.txn_type when 'usage' then 'Vacation approved for ' || to_char(t.effective_date, 'Mon FMDD, YYYY')
+             when 'adjustment' then 'Vacation balance adjusted: ' || coalesce(t.reason, '')
+             else coalesce(t.reason, initcap(replace(t.txn_type::text, '_', ' '))) end,
            t.amount
     from public.vacation_transactions t where t.employee_id = emp
     union all
     select t.created_at, 'lieu',
-           case t.txn_type when 'credit' then 'Lieu credit approved' when 'usage' then 'Lieu day used'
-             when 'usage_reversal' then 'Lieu time off cancelled' when 'adjustment' then 'Lieu balance adjusted'
-             when 'expiry' then 'Lieu expired' else 'Opening lieu balance' end || coalesce(': ' || t.reason, ''),
+           case t.txn_type when 'credit' then 'Lieu credit approved: ' || coalesce(t.reason, '')
+             when 'adjustment' then 'Lieu balance adjusted: ' || coalesce(t.reason, '')
+             else coalesce(t.reason, initcap(replace(t.txn_type::text, '_', ' '))) end,
            t.amount
     from public.lieu_transactions t where t.employee_id = emp
     union all

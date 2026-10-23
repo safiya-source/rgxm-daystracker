@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RGXM People
 
-## Getting Started
+Internal people platform for RGXM. Phase 1 covers the employee directory, contractual vacation, project-based lieu time, approvals, a shared team calendar, notifications and reports.
 
-First, run the development server:
+- **Stack:** Next.js 15 (App Router, TypeScript, Tailwind CSS v4) + Supabase (Postgres, Auth, Row-Level Security, pg_cron).
+- **Business rules:** see [`BUSINESS_RULES.md`](BUSINESS_RULES.md).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## How it's built
+
+```
+src/app/(app)/            Signed-in pages (employee + leadership)
+src/app/auth, login, …    Sign-in, invitations, password reset
+src/lib/rules/            Pure TS rules (tenure, lieu, day counting) for live previews
+supabase/migrations/      Schema, RLS policies, and all balance logic (SQL functions)
+tests/db/                 Database tests: privacy/RLS, balances, lieu, concurrency, TS↔SQL parity
+e2e/                      Playwright end-to-end workflows
+scripts/                  bootstrap-admin (first admin) and seed-demo (fictional data, local only)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Security model:**
+- **Reads:** every table has Row-Level Security.
+  - Employees can read only their own rows.
+  - Approvers can read the workflow records of the people they approve.
+  - People Admins can read everything.
+- **Writes:** users never write to tables directly. Every change goes through a Postgres function that:
+  - checks permissions;
+  - locks the rows involved;
+  - writes to append-only ledgers, so history is never edited;
+  - records approvals and audit-log entries.
+- **Service-role key:** used only on the server, for invitations, sign-in bans and the scheduled job.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Balances:** vacation and lieu are ledgers.
+- A balance is the sum of its transactions: allocations, accruals, usage, reversals, adjustments, credits and expiry.
+- Corrections are new transactions. Nothing is updated or deleted.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Extending:** `employee_profiles.id` is the central key. Future modules attach to it with their own tables and RLS policies, using the helpers in `private.*`. Examples: `compensation_records(employee_id …)`, `employment_documents`, `performance_reviews`.
 
-## Learn More
+## Local development
 
-To learn more about Next.js, take a look at the following resources:
+Requirements: Node 20+, Docker.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm install
+npm run db:start            # local Supabase; prints URL + keys
+cp .env.example .env.local  # paste the anon + service_role keys
+npm run db:reset            # apply migrations
+npm run seed:demo           # optional: fictional demo team (password: rgxm-demo-2026)
+npm run dev                 # http://localhost:3000
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Local emails (invitations, password resets) are delivered to Mailpit at http://127.0.0.1:54324.
 
-## Deploy on Vercel
+### Tests
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run typecheck && npm run lint
+npm test            # unit + database tests (needs local Supabase running)
+npm run test:e2e    # resets + seeds the local DB, then runs browser tests
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deploying
+
+1. **Supabase project:**
+   - Create it, in the Canada (Central) region (`ca-central-1`).
+   - Then run:
+     ```bash
+     npx supabase link --project-ref <ref>
+     npx supabase db push
+     ```
+   - In Database → Extensions, confirm `pg_cron` is enabled. The migration schedules `private.daily_maintenance()` at 10:15 UTC.
+2. **Supabase Auth settings:**
+   - Disable public sign-ups.
+   - Set the Site URL to your app URL.
+   - Add `https://<your-domain>/auth/confirm` to the redirect URLs.
+   - Configure SMTP (e.g. Resend) so invitations and password resets are delivered.
+3. **Vercel:**
+   - Import the repo.
+   - Set the environment variables from `.env.example`, with production values.
+   - `vercel.json` schedules `/api/cron/daily`, which runs maintenance and sends email notifications when `RESEND_API_KEY` is set and email is enabled in Settings.
+4. **First People Admin:**
+   ```bash
+   npm run bootstrap-admin -- "Full Name" name@rgxm.com 2019-04-01
+   ```
+   This sends an invitation. Sign in, then follow **Leadership → Overview → Finish setting up**: agency settings → employees (form or CSV import) → approvers → invitations → launch.
+
+Never run `seed:demo` against production. The script refuses non-local URLs unless you pass `--force`.
+
+## Maintenance
+
+- **Daily job:**
+  - posts accruals and new-year allocations;
+  - applies the carryover cap and lieu expiry, if configured;
+  - sends anniversary and upcoming-absence reminders;
+  - adds next year's holidays.
+- **Running it by hand:** Settings → Agency → *Recalculate balances & send reminders now*.
+- **Holidays:** review them each year (Settings → Holidays), e.g. to add office closures.
+- **Rule changes:**
+  - Changing lieu rules creates a new version with an effective date.
+  - Entitlement changes are effective-dated per employee.
+  - Neither rewrites history.
+- **Corrections:** use *Adjust a balance* on the employee page. A reason is required, and the employee is notified.
+- **Leavers:** deactivate (don't delete) to keep records. This also disables their sign-in.
+- **Audit trail:** `public.audit_logs` records every change to employees, entitlements, ledgers, requests, settings and holidays (readable by People Admins via SQL).
+- **Schema changes:** add a new file in `supabase/migrations/`, run `npm run db:reset && npm test` locally, then `supabase db push`.
