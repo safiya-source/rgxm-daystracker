@@ -64,7 +64,11 @@ describe("vacation entitlements & balances", () => {
       // 20×181/365 + 25×184/365 − 20 = 2.52 → 3.0
       expect((await c.vacation(bob)).available).toBe(23);
       await c.as(admin);
-      expect(await c.err(() => c.q(`select admin_set_entitlement($1, '2026-07-01', 30, 'calendar', 'upfront', 'dup')`, [bob.id]))).toMatch(/already starts/);
+      // Same effective date corrects the entry rather than failing.
+      await c.q(`select admin_set_entitlement($1, '2026-07-01', 30, 'calendar', 'upfront', 'Typo fix')`, [bob.id]);
+      // 20×181/365 + 30×184/365 − 20 = 5.04 → 5.5
+      expect((await c.vacation(bob)).available).toBe(25.5);
+      await c.as(admin);
       expect(await c.err(() => c.q(`select admin_set_entitlement($1, '2026-08-01', 30, 'calendar', 'upfront', '')`, [bob.id]))).toMatch(/reason/);
     });
   });

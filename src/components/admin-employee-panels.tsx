@@ -34,7 +34,7 @@ export function StatusButton({ id, status }: { id: string; status: "active" | "i
 export function EntitlementForm({ id, current, today }: { id: string; current: { annual_days: number; year_type: string; allocation_method: string } | null; today: string }) {
   return (
     <Card>
-      <CardHeader title="Change entitlement" subtitle="Effective-dated. Upfront allocations are trued-up for the rest of the year." />
+      <CardHeader title="Change entitlement" subtitle="Takes effect from the date you choose; upfront allocations are adjusted for the rest of the year. Using the same date as an existing entry corrects it." />
       <ActionForm action={changeEntitlement} resetOnSuccess className="grid gap-3 px-5 pb-5 sm:grid-cols-2">
         <input type="hidden" name="id" value={id} />
         <Field label="Annual days"><Input name="annual_days" type="number" step="0.5" min="0" max="60" required defaultValue={current?.annual_days} /></Field>
