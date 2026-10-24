@@ -60,6 +60,9 @@ npm run test:e2e    # resets + seeds the local DB, then runs browser tests
 
 ## Deploying
 
+No command line needed: `supabase/setup/1-database.sql` (all migrations in one file) and `supabase/setup/2-first-admin.sql` can be pasted into the Supabase SQL Editor. Regenerate the first file whenever migrations are added. The CLI route below works too.
+
+
 1. **Supabase project:**
    - Create it, in the Canada (Central) region (`ca-central-1`).
    - Then run:
