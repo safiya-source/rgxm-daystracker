@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: "Time off, lieu and team availability for RGXM.",
   robots: { index: false, follow: false },
 };
-export const viewport: Viewport = { themeColor: "#f7f6f3" };
+export const viewport: Viewport = { themeColor: "#f4f4f5" };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (

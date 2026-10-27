@@ -4,31 +4,35 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  --color-canvas: #f7f6f3;
+  /* RGXM brand: black, white and silver. Status colours stay (muted) for at-a-glance meaning. */
+  --color-canvas: #f4f4f5;
   --color-surface: #ffffff;
-  --color-line: #e9e6e0;
-  --color-line-strong: #d9d5cd;
-  --color-ink: #1d1c1a;
-  --color-ink-soft: #46443f;
-  --color-muted: #77736b;
+  --color-line: #e4e4e7;
+  --color-line-strong: #d4d4d8;
+  --color-ink: #0a0a0a;
+  --color-ink-soft: #3f3f46;
+  --color-muted: #71717a;
 
-  --color-accent: #ff5a1f;
-  --color-accent-strong: #e84a12;
-  --color-accent-soft: #fff1ea;
+  --color-accent: #0a0a0a;
+  --color-accent-strong: #0a0a0a;
+  --color-accent-soft: #ededef;
 
-  --color-vacation: #0e9f95;
-  --color-vacation-soft: #e3f6f3;
-  --color-lieu: #7357ff;
-  --color-lieu-soft: #efebff;
-  --color-holiday: #c98a04;
-  --color-holiday-soft: #fdf4dc;
+  --color-silver: #a1a1aa;
+  --color-silver-light: #e4e4e7;
 
-  --color-ok: #16a34a;
-  --color-ok-soft: #e8f7ee;
-  --color-warn: #b45309;
-  --color-warn-soft: #fef3e2;
-  --color-danger: #dc2626;
-  --color-danger-soft: #fdecec;
+  --color-vacation: #18181b;
+  --color-vacation-soft: #ececee;
+  --color-lieu: #5f6670;
+  --color-lieu-soft: #eef0f2;
+  --color-holiday: #85692a;
+  --color-holiday-soft: #f5f0e4;
+
+  --color-ok: #15803d;
+  --color-ok-soft: #edf6f0;
+  --color-warn: #a16207;
+  --color-warn-soft: #faf4e6;
+  --color-danger: #b91c1c;
+  --color-danger-soft: #fbeeee;
 
   --radius-xl: 0.875rem;
   --radius-2xl: 1.125rem;
@@ -48,6 +52,17 @@ body {
 input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.55; cursor: pointer; }
 
 @utility tabular { font-variant-numeric: tabular-nums; }
+
+/* Brushed-silver finish for brand accents (logo, hairlines). */
+@utility bg-silver {
+  background-image: linear-gradient(135deg, #fafafa 0%, #d4d4d8 28%, #9a9aa2 52%, #e4e4e7 74%, #b4b4bb 100%);
+}
+@utility text-silver {
+  background-image: linear-gradient(135deg, #a1a1aa 0%, #52525b 45%, #a1a1aa 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
 
 /* Grid items may shrink below their content (wide tables scroll inside instead of widening the page). */
 .grid > * { min-width: 0; }

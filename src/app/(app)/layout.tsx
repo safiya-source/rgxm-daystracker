@@ -36,6 +36,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-dvh">
+      <div aria-hidden className="bg-silver fixed inset-x-0 top-0 z-[60] h-[3px]" />
       <Sidebar personal={personal} leadership={leadership} name={me.full_name} roleLabel={ROLE_LABEL[me.role]} unread={unread ?? 0} />
       <main className="lg:pl-[272px]">
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-10 lg:py-10">{children}</div>

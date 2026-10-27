@@ -17,9 +17,9 @@ function setupErrorPage(lines: string[]) {
   const items = lines.map((l) => `<li>${l.replace(/</g, "&lt;")}</li>`).join("");
   return new NextResponse(
     `<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><title>RGXM People: setup needed</title>
-<body style="font-family:system-ui,sans-serif;max-width:560px;margin:15vh auto;padding:0 20px;color:#1d1c1a">
+<body style="font-family:system-ui,sans-serif;max-width:560px;margin:15vh auto;padding:0 20px;color:#0a0a0a">
 <h1 style="font-size:22px">RGXM People can't start yet</h1><ul style="line-height:1.6">${items}</ul>
-<p style="color:#77736b">In Vercel: Settings → Environment Variables, fix the above (NEXT_PUBLIC_… variables as <b>Config</b>), then Deployments → ⋯ → Redeploy.</p></body>`,
+<p style="color:#71717a">In Vercel: Settings → Environment Variables, fix the above (NEXT_PUBLIC_… variables as <b>Config</b>), then Deployments → ⋯ → Redeploy.</p></body>`,
     { status: 500, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } },
   );
 }

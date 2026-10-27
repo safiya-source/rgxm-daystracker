@@ -79,8 +79,8 @@ export default async function DashboardPage() {
               <p className="text-xl font-semibold tracking-tight">{formatTenure(me.start_date, today)}</p>
               <p className="text-xs text-muted">Since {formatDate(me.start_date, { long: true })}</p>
             </div>
-            <div className="rounded-xl bg-accent-soft p-3.5">
-              <p className="text-[13px] text-accent-strong">Next work anniversary</p>
+            <div className="bg-silver rounded-xl p-3.5 shadow-card">
+              <p className="text-[13px] font-medium text-ink-soft">Next work anniversary</p>
               <p className="text-[15px] font-semibold">
                 {anniv.years} year{anniv.years === 1 ? "" : "s"} · {formatDate(anniv.date, { long: true })}
               </p>
