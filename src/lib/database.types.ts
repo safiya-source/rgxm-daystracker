@@ -79,14 +79,14 @@ isOneToOne: false
                   ]
                 },"employee_profiles": {
                   Row: {
-                    "backup_approver_id": string | null,"created_at": string,"deactivated_at": string | null,"department": string | null,"full_name": string,"id": string,"invited_at": string | null,"job_title": string | null,"manager_id": string | null,"role": Database["public"]['Enums']["app_role"],"standard_day_hours": number | null,"start_date": string,"status": Database["public"]['Enums']["employment_status"],"updated_at": string,"user_id": string | null,"work_email": string
+                    "backup_approver_id": string | null,"created_at": string,"deactivated_at": string | null,"department": string | null,"full_name": string,"id": string,"invited_at": string | null,"job_title": string | null,"manager_id": string | null,"role": Database["public"]['Enums']["app_role"],"self_approval_allowed": boolean,"standard_day_hours": number | null,"start_date": string,"status": Database["public"]['Enums']["employment_status"],"updated_at": string,"user_id": string | null,"work_email": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "backup_approver_id"?: string | null,"created_at"?: string,"deactivated_at"?: string | null,"department"?: string | null,"full_name": string,"id"?: string,"invited_at"?: string | null,"job_title"?: string | null,"manager_id"?: string | null,"role"?: Database["public"]['Enums']["app_role"],"standard_day_hours"?: number | null,"start_date": string,"status"?: Database["public"]['Enums']["employment_status"],"updated_at"?: string,"user_id"?: string | null,"work_email": string
+                    "backup_approver_id"?: string | null,"created_at"?: string,"deactivated_at"?: string | null,"department"?: string | null,"full_name": string,"id"?: string,"invited_at"?: string | null,"job_title"?: string | null,"manager_id"?: string | null,"role"?: Database["public"]['Enums']["app_role"],"self_approval_allowed"?: boolean,"standard_day_hours"?: number | null,"start_date": string,"status"?: Database["public"]['Enums']["employment_status"],"updated_at"?: string,"user_id"?: string | null,"work_email": string
                   }
                   Update: {
-                    "backup_approver_id"?: string | null,"created_at"?: string,"deactivated_at"?: string | null,"department"?: string | null,"full_name"?: string,"id"?: string,"invited_at"?: string | null,"job_title"?: string | null,"manager_id"?: string | null,"role"?: Database["public"]['Enums']["app_role"],"standard_day_hours"?: number | null,"start_date"?: string,"status"?: Database["public"]['Enums']["employment_status"],"updated_at"?: string,"user_id"?: string | null,"work_email"?: string
+                    "backup_approver_id"?: string | null,"created_at"?: string,"deactivated_at"?: string | null,"department"?: string | null,"full_name"?: string,"id"?: string,"invited_at"?: string | null,"job_title"?: string | null,"manager_id"?: string | null,"role"?: Database["public"]['Enums']["app_role"],"self_approval_allowed"?: boolean,"standard_day_hours"?: number | null,"start_date"?: string,"status"?: Database["public"]['Enums']["employment_status"],"updated_at"?: string,"user_id"?: string | null,"work_email"?: string
                   }
                   Relationships: [
                     {
@@ -502,6 +502,9 @@ isOneToOne: false
                            },
 "admin_set_entitlement":
 { Args: { "allocation_method": Database["public"]['Enums']["allocation_method"],"annual_days": number,"effective_from": string,"emp": string,"note": string,"year_type": Database["public"]['Enums']["vacation_year_type"] }; Returns: string
+                           },
+"admin_set_self_approval":
+{ Args: { "allowed": boolean,"emp": string }; Returns: undefined
                            },
 "admin_update_project":
 { Args: { "client": string,"is_active": boolean,"name": string,"project_id": string }; Returns: undefined

@@ -151,6 +151,15 @@ export async function setEmployeeStatus(_: ActionResult, f: FormData): Promise<A
   });
 }
 
+export async function setSelfApproval(_: ActionResult, f: FormData): Promise<ActionResult> {
+  return attempt(async () => {
+    const supabase = await createClient();
+    const allowed = str(f, "allowed") === "true";
+    check(await supabase.rpc("admin_set_self_approval", { emp: str(f, "id"), allowed }));
+    return done(allowed ? "They can now approve their own requests" : "Self-approval turned off");
+  });
+}
+
 export async function changeEntitlement(_: ActionResult, f: FormData): Promise<ActionResult> {
   return attempt(async () => {
     const supabase = await createClient();

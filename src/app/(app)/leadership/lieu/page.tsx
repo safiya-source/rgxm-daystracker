@@ -12,8 +12,8 @@ export default async function LieuApprovalsPage() {
   const supabase = await createClient();
   const select = "*, employee:employee_profiles!lieu_submissions_employee_id_fkey(full_name), project:projects(name), lieu_work_entries(id, work_date, hours, day_type, proposed_credit, approved_credit, category, needs_review, review_reason)";
   const [{ data: pending }, { data: recent }] = await Promise.all([
-    supabase.from("lieu_submissions").select(select).eq("status", "pending").neq("employee_id", me.id).order("created_at"),
-    supabase.from("lieu_submissions").select(select).neq("status", "pending").neq("employee_id", me.id).order("updated_at", { ascending: false }).limit(25),
+    supabase.from("lieu_submissions").select(select).eq("status", "pending").not("employee_id", "in", `(${me.self_approval_allowed ? "00000000-0000-0000-0000-000000000000" : me.id})`).order("created_at"),
+    supabase.from("lieu_submissions").select(select).neq("status", "pending").not("employee_id", "in", `(${me.self_approval_allowed ? "00000000-0000-0000-0000-000000000000" : me.id})`).order("updated_at", { ascending: false }).limit(25),
   ]);
   const contexts = await Promise.all((pending ?? []).map(async (s) => (await supabase.rpc("lieu_review_context", { submission_id: s.id }).single()).data));
 

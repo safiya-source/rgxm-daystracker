@@ -182,3 +182,47 @@ describe("employee privacy (RLS + RPC authorization)", () => {
     });
   });
 });
+
+describe("optional self-approval", () => {
+  it("is off by default, can only be enabled by People Admins, and then allows approving your own requests", async () => {
+    await tx(async (c) => {
+      const { admin, alice } = await team(c);
+      const owner = await c.addEmployee(admin, { name: "Olive Owner", role: "people_admin" });
+      const me = await c.addEmployee(admin, { name: "Sam Self", role: "people_admin", manager_id: owner.id, opening_vacation: 10 });
+
+      await c.as(me);
+      const { submit_time_off: id1 } = await c.one(`select submit_time_off('vacation', '2026-11-16', '2026-11-16')`);
+      expect(await c.err(() => c.q(`select review_time_off($1, 'approved')`, [id1]))).toMatch(/not authorised/);
+
+      // Employees can't grant it (to themselves or anyone).
+      await c.as(alice);
+      expect(await c.err(() => c.q(`select admin_set_self_approval($1, true)`, [alice.id]))).toMatch(/People Admins/);
+
+      await c.as(admin);
+      await c.q(`select admin_set_self_approval($1, true)`, [me.id]);
+
+      // Now both the person and their assigned approver can approve.
+      await c.as(me);
+      await c.q(`select review_time_off($1, 'approved')`, [id1]);
+      const { submit_time_off: id2 } = await c.one(`select submit_time_off('vacation', '2026-11-17', '2026-11-17')`);
+      await c.as(owner);
+      await c.q(`select review_time_off($1, 'approved')`, [id2]);
+      expect((await c.vacation(me)).available).toBe(8);
+
+      // Lieu too.
+      await c.as(me);
+      const { create_project: pid } = await c.one(`select create_project('Self ' || gen_random_uuid())`);
+      const { submit_lieu: sub } = await c.one(`select submit_lieu($1, '[{"work_date":"2026-10-17","hours":6}]')`, [pid]);
+      await c.q(`select review_lieu($1, 'approved')`, [sub]);
+      expect((await c.lieu(me)).available).toBe(1);
+
+      // Still off for everyone else.
+      await c.as(alice);
+      const { submit_time_off: id3 } = await c.one(`select submit_time_off('vacation', '2026-11-18', '2026-11-18')`);
+      expect(await c.err(() => c.q(`select review_time_off($1, 'approved')`, [id3]))).toMatch(/not authorised/);
+      await c.su();
+      const rec = await c.one(`select actor_id from approval_records where subject_id = $1 and action = 'approved'`, [id1]);
+      expect(rec.actor_id).toBe(me.id);
+    });
+  });
+});

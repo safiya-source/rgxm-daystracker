@@ -5,7 +5,7 @@ import { getToday } from "@/lib/data";
 import { Alert, Card, CardHeader, LinkButton, PageHeader, Table, td, th } from "@/components/ui";
 import { ProfileView } from "@/components/profile-view";
 import { Ledger } from "@/components/ledger";
-import { AdjustForm, EntitlementForm, InviteButton, StatusButton } from "@/components/admin-employee-panels";
+import { AdjustForm, EntitlementForm, InviteButton, SelfApprovalToggle, StatusButton } from "@/components/admin-employee-panels";
 import { formatDate } from "@/lib/rules/dates";
 import { formatDays, ROLE_LABEL } from "@/lib/format";
 
@@ -42,6 +42,8 @@ export default async function EmployeeAdminPage({ params, searchParams }: { para
       )}
 
       <ProfileView p={p} approvers={(approvers ?? []).map((a) => a.full_name)} />
+
+      <div className="mt-5"><SelfApprovalToggle id={id} allowed={p.self_approval_allowed} approvers={(approvers ?? []).map((a) => a.full_name)} /></div>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-2">
         <EntitlementForm id={id} current={current} today={today} />

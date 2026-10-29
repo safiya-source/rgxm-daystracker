@@ -16,9 +16,9 @@ export default async function RequestsPage() {
   const settings = await getSettings();
   const [{ data: pending }, { data: recent }, { data: people }, projects] = await Promise.all([
     supabase.from("time_off_requests").select("*, employee:employee_profiles!time_off_requests_employee_id_fkey(full_name), project:projects(name)")
-      .eq("status", "pending").neq("employee_id", me.id).order("start_date"),
+      .eq("status", "pending").not("employee_id", "in", `(${me.self_approval_allowed ? "00000000-0000-0000-0000-000000000000" : me.id})`).order("start_date"),
     supabase.from("time_off_requests").select("*, employee:employee_profiles!time_off_requests_employee_id_fkey(full_name)")
-      .neq("status", "pending").neq("employee_id", me.id).order("updated_at", { ascending: false }).limit(30),
+      .neq("status", "pending").not("employee_id", "in", `(${me.self_approval_allowed ? "00000000-0000-0000-0000-000000000000" : me.id})`).order("updated_at", { ascending: false }).limit(30),
     supabase.from("employee_profiles").select("id, full_name").neq("id", me.id).eq("status", "active").order("full_name"),
     getProjects(),
   ]);

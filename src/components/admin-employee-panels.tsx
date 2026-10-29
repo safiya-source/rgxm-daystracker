@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { ActionForm, SubmitButton } from "@/components/forms";
 import { Alert, Button, Card, CardHeader, Field, Input, Select } from "@/components/ui";
-import { adjustBalance, changeEntitlement, inviteEmployee, setEmployeeStatus } from "@/app/(app)/leadership/actions";
+import { adjustBalance, changeEntitlement, inviteEmployee, setEmployeeStatus, setSelfApproval } from "@/app/(app)/leadership/actions";
 
 export function InviteButton({ id, hasLogin, invitedAt }: { id: string; hasLogin: boolean; invitedAt: string | null }) {
   const [state, action, pending] = useActionState(inviteEmployee, null);
@@ -71,6 +71,24 @@ export function AdjustForm({ id }: { id: string }) {
         <Field label="Reason" className="sm:col-span-2"><Input name="reason" required placeholder="e.g. Correction to opening balance" /></Field>
         <div className="sm:col-span-2"><SubmitButton variant="secondary">Record adjustment</SubmitButton></div>
       </ActionForm>
+    </Card>
+  );
+}
+
+export function SelfApprovalToggle({ id, allowed, approvers }: { id: string; allowed: boolean; approvers: string[] }) {
+  const [state, action, pending] = useActionState(setSelfApproval, null);
+  return (
+    <Card>
+      <CardHeader title="Approvals"
+        subtitle={`Requests go to ${approvers.length ? approvers.join(" or ") : "People Admins"}${allowed ? ", and they can also approve their own." : "."}`} />
+      <form action={action} className="flex flex-wrap items-center gap-3 px-5 pb-5">
+        <input type="hidden" name="id" value={id} />
+        <input type="hidden" name="allowed" value={allowed ? "false" : "true"} />
+        <Button variant="secondary" disabled={pending}>{allowed ? "Turn off self-approval" : "Allow them to approve their own requests"}</Button>
+        {state?.message && <span className="text-sm text-ok">{state.message}</span>}
+        {state?.error && <span className="text-sm text-danger">{state.error}</span>}
+        <p className="w-full text-xs text-muted">Self-approvals are recorded in the request history like any other approval.</p>
+      </form>
     </Card>
   );
 }

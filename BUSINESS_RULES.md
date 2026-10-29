@@ -74,7 +74,7 @@ a code change.
 ## Approvals & permissions
 
 - Requests go to the employee's **assigned manager** and **backup approver**. If neither is set, they go to People Admins.
-- Nobody can approve their own request.
+- Nobody can approve their own request, **unless** a People Admin turns on *"Allow them to approve their own requests"* for that person (employee page → Approvals). RGXM uses this for Safiya, alongside her assigned approver (Rich Gaggi). Self-approvals are recorded in the request history like any other approval.
 - People Admins can approve anyone, except other People Admins (see above).
 - Approvals lock the request row, so two approvers acting at once produce exactly one outcome.
 - **Employees** see only their own profile, balances, requests and history.
