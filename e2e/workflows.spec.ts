@@ -166,3 +166,27 @@ test("admin shares an invite link; the new person sets a password and signs in",
   await p3.waitForURL(/auth\/set-password/);
   await again.close();
 });
+
+test("an old-style Supabase link that falls back to the site root still signs the person in", async ({ page, browser }) => {
+  const email = `legacy.${Date.now()}@demo.rgxm.test`;
+  await signIn(page, "jordan");
+  await go(page, "/leadership/employees/new");
+  await page.fill("input[name=full_name]", "Leo Legacy");
+  await page.fill("input[name=work_email]", email);
+  await page.fill("input[name=start_date]", "2022-05-02");
+  await page.getByRole("button", { name: "Add employee" }).click();
+  await page.waitForURL(/saved=1/);
+
+  // Generate a classic Supabase invite link whose redirect is NOT allow-listed,
+  // so Supabase falls back to its Site URL root with tokens in the #hash.
+  const { createClient } = await import("@supabase/supabase-js");
+  const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } });
+  const { data, error } = await admin.auth.admin.generateLink({ type: "invite", email, options: { redirectTo: "https://not-allowed.example.com/x" } });
+  expect(error).toBeNull();
+
+  const theirs = await browser.newContext();
+  const p2 = await theirs.newPage();
+  await p2.goto(data.properties?.action_link ?? "");
+  await p2.waitForURL(/auth\/set-password/, { timeout: 30_000 });
+  await theirs.close();
+});
