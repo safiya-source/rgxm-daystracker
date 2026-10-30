@@ -25,7 +25,7 @@ export function Logo({ compact }: { compact?: boolean }) {
       {!compact && (
         <span className="flex items-baseline gap-1.5 leading-none">
           <span className="text-[15px] font-bold tracking-[0.18em] text-ink">RGXM</span>
-          <span className="text-silver text-[11px] font-semibold uppercase tracking-[0.22em]">People</span>
+          <span className="text-silver text-[11px] font-semibold uppercase tracking-[0.22em]">Daystracker</span>
         </span>
       )}
     </span>

@@ -1,4 +1,4 @@
-// Create the first People Admin for a fresh RGXM People install.
+// Create the first People Admin for a fresh RGXM Daystracker install.
 //   node --env-file=.env.local scripts/bootstrap-admin.mjs "Full Name" email@rgxm.com 2019-04-01 [--password=…]
 // Without --password an invitation email is sent (requires SMTP configured in Supabase).
 import { createClient } from "@supabase/supabase-js";

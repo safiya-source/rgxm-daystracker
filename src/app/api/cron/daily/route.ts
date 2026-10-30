@@ -23,10 +23,10 @@ export async function GET(req: NextRequest) {
         method: "POST",
         headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
         body: JSON.stringify({
-          from: process.env.EMAIL_FROM ?? "RGXM People <people@rgxm.com>",
+          from: process.env.EMAIL_FROM ?? "RGXM Daystracker <people@rgxm.com>",
           to: n.email,
           subject: n.title,
-          text: `Hi ${n.full_name.split(" ")[0]},\n\n${n.title}${n.body ? `\n${n.body}` : ""}\n\n${n.link ? site + n.link : site}\n\n— RGXM People`,
+          text: `Hi ${n.full_name.split(" ")[0]},\n\n${n.title}${n.body ? `\n${n.body}` : ""}\n\n${n.link ? site + n.link : site}\n\n— RGXM Daystracker`,
         }),
       });
       if (res.ok) sent.push(n.id);

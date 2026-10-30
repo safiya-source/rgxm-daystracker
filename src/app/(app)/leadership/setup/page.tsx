@@ -37,7 +37,7 @@ export default async function SetupPage() {
 
   return (
     <>
-      <PageHeader title="Set up RGXM People" subtitle="Five steps to get the team onto their dashboards." />
+      <PageHeader title="Set up RGXM Daystracker" subtitle="Five steps to get the team onto their dashboards." />
       <ol className="mb-6 flex flex-wrap gap-2">
         {steps.map((st) => (
           <li key={st.n} className={cn("rounded-full px-3 py-1 text-sm", st.done ? "bg-ok-soft text-ok" : "bg-black/[0.05] text-muted")}>{st.n}. {st.title}</li>

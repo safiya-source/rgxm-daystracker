@@ -69,7 +69,7 @@ export default function ConfirmPage() {
   }
   if (needsClick) {
     return (
-      <AuthShell title="Welcome to RGXM People" subtitle="Next you'll choose a password for your account.">
+      <AuthShell title="Welcome to RGXM Daystracker" subtitle="Next you'll choose a password for your account.">
         <Button size="lg" className="w-full" onClick={verifyTokenHash} disabled={busy}>{busy ? "One moment…" : "Continue"}</Button>
       </AuthShell>
     );

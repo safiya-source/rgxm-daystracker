@@ -1,4 +1,4 @@
--- RGXM People: complete database setup for a NEW Supabase project.
+-- RGXM Daystracker: complete database setup for a NEW Supabase project.
 -- Generated from supabase/migrations/* (in order). Paste into Supabase → SQL Editor and click Run, once.
 -- Later schema changes ship as new migration files; don't re-run this.
 

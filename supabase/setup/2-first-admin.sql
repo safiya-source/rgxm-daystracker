@@ -1,4 +1,4 @@
--- RGXM People: create the first People Admin.
+-- RGXM Daystracker: create the first People Admin.
 -- 1. In Supabase → Authentication → Users → "Add user" → "Create new user",
 --    enter the admin's email and a password, and tick "Auto Confirm User".
 -- 2. Edit the three values below, paste this into SQL Editor and click Run.

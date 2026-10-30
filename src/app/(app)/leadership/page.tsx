@@ -55,7 +55,7 @@ export default async function OverviewPage() {
 
       {admin && !settings.onboarding_completed && (
         <Alert tone="info" className="mb-5 flex items-center justify-between gap-3">
-          <span><strong>Finish setting up RGXM People.</strong> Agency settings, employees, approvers and invitations, in five short steps.</span>
+          <span><strong>Finish setting up RGXM Daystracker.</strong> Agency settings, employees, approvers and invitations, in five short steps.</span>
           <Link href="/leadership/setup" className="shrink-0 font-medium text-accent">Open setup →</Link>
         </Alert>
       )}

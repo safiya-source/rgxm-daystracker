@@ -1,4 +1,4 @@
-# RGXM People
+# RGXM Daystracker
 
 Internal people platform for RGXM. Phase 1 covers the employee directory, contractual vacation, project-based lieu time, approvals, a shared team calendar, notifications and reports.
 

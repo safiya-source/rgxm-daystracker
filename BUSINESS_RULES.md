@@ -1,11 +1,11 @@
-# RGXM People: business rules (Phase 1)
+# RGXM Daystracker: business rules (Phase 1)
 
 This file records every rule the app uses to calculate balances. It covers the
 decisions RGXM made during planning and the defaults used where the spec was
 silent. Anything marked **configurable** can be changed in **Settings** without
 a code change.
 
-> RGXM People tracks entitlements and balances. It is **not** legal advice and does
+> RGXM Daystracker tracks entitlements and balances. It is **not** legal advice and does
 > not make Employment Standards Act (ESA) compliance determinations. Where a case is
 > uncertain, the app flags it for People Admin review.
 
@@ -27,7 +27,7 @@ a code change.
   - When the entitlement changes mid-year, the rest of the year is trued up the same way.
 - **Progressive accrual:** entitlement ÷ 12 is added at the end of each completed month. A partial first month is prorated by calendar days. Rounding is cumulative, so 12 months always add up to exactly the entitlement.
 - **Opening balances:**
-  - For people already employed when RGXM People goes live, enter the vacation they have available on the "balances as of" date, plus any carryover.
+  - For people already employed when RGXM Daystracker goes live, enter the vacation they have available on the "balances as of" date, plus any carryover.
   - The current year's allocation is assumed to be included in that number. Upfront allocation resumes next year; accrual continues from that date.
   - People hired this year are treated as new hires and prorated automatically.
 - **Pending requests** don't reduce the balance. They are shown as "pending" and "available after pending".
