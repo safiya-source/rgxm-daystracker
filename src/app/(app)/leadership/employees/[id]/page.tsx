@@ -5,7 +5,7 @@ import { getToday } from "@/lib/data";
 import { Alert, Card, CardHeader, LinkButton, PageHeader, Table, td, th } from "@/components/ui";
 import { ProfileView } from "@/components/profile-view";
 import { Ledger } from "@/components/ledger";
-import { AdjustForm, EntitlementForm, InviteButton, SelfApprovalToggle, StatusButton } from "@/components/admin-employee-panels";
+import { AdjustForm, EntitlementForm, InviteButton, InviteLinkPanel, SelfApprovalToggle, StatusButton } from "@/components/admin-employee-panels";
 import { formatDate } from "@/lib/rules/dates";
 import { formatDays, ROLE_LABEL } from "@/lib/format";
 
@@ -38,8 +38,10 @@ export default async function EmployeeAdminPage({ params, searchParams }: { para
         </>} />
       {saved && <Alert tone="ok" className="mb-5">Saved.</Alert>}
       {p.status === "active" && !p.user_id && (
-        <Alert tone="warn" className="mb-5">{p.invited_at ? `Invited ${formatDate(p.invited_at.slice(0, 10))}. They haven't signed in yet.` : "Not invited yet. Send an invitation so they can sign in."}</Alert>
+        <Alert tone="warn" className="mb-5">{p.invited_at ? `Invited ${formatDate(p.invited_at.slice(0, 10))}. They haven't signed in yet.` : "Not invited yet. Create an invite link below and send it to them."}</Alert>
       )}
+
+      {p.status === "active" && <div className="mb-5"><InviteLinkPanel id={id} email={p.work_email} hasLogin={!!p.user_id} /></div>}
 
       <ProfileView p={p} approvers={(approvers ?? []).map((a) => a.full_name)} />
 

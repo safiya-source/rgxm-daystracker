@@ -110,3 +110,42 @@ test("CSV export works for People Admins", async ({ page }) => {
   expect(body).toContain("Employee,Status,Annual entitlement");
   expect(body).toContain("Sam Okafor");
 });
+
+test("admin shares an invite link; the new person sets a password and signs in", async ({ page, browser }) => {
+  const email = `newbie.${Date.now()}@demo.rgxm.test`;
+  await signIn(page, "jordan");
+  await go(page, "/leadership/employees/new");
+  await page.fill("input[name=full_name]", "Nina Newbie");
+  await page.fill("input[name=work_email]", email);
+  await page.fill("input[name=start_date]", "2023-01-09");
+  await page.fill("input[name=annual_days]", "15");
+  await page.getByRole("button", { name: "Add employee" }).click();
+  await page.waitForURL(/leadership\/employees\/.+saved=1/);
+  await page.waitForLoadState("networkidle");
+
+  await page.getByRole("button", { name: "Create invite link" }).click();
+  const linkBox = page.locator("input[readonly]");
+  await expect(linkBox).toHaveValue(/^http.*verify/);
+  const link = await linkBox.inputValue();
+
+  // The new person opens the link in their own browser.
+  const theirs = await browser.newContext();
+  const p2 = await theirs.newPage();
+  await p2.goto(link);
+  await p2.waitForURL(/auth\/set-password/, { timeout: 30_000 });
+  await p2.waitForLoadState("networkidle");
+  await p2.fill("input[name=password]", "nina-secret-pass-1");
+  await p2.fill("input[name=confirm]", "nina-secret-pass-1");
+  await p2.getByRole("button", { name: "Save and continue" }).click();
+  await p2.waitForURL(/dashboard/);
+  await expect(p2.getByRole("heading", { name: /Nina/ })).toBeVisible();
+
+  // And can sign in again later with that password.
+  await theirs.clearCookies();
+  await p2.goto("/login");
+  await p2.fill("input[name=email]", email);
+  await p2.fill("input[name=password]", "nina-secret-pass-1");
+  await p2.click("button[type=submit]");
+  await p2.waitForURL(/dashboard/);
+  await theirs.close();
+});

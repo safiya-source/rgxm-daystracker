@@ -1,9 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { ActionForm, SubmitButton } from "@/components/forms";
 import { Alert, Button, Card, CardHeader, Field, Input, Select } from "@/components/ui";
-import { adjustBalance, changeEntitlement, inviteEmployee, setEmployeeStatus, setSelfApproval } from "@/app/(app)/leadership/actions";
+import { adjustBalance, changeEntitlement, createInviteLink, inviteEmployee, setEmployeeStatus, setSelfApproval } from "@/app/(app)/leadership/actions";
 
 export function InviteButton({ id, hasLogin, invitedAt }: { id: string; hasLogin: boolean; invitedAt: string | null }) {
   const [state, action, pending] = useActionState(inviteEmployee, null);
@@ -14,6 +14,36 @@ export function InviteButton({ id, hasLogin, invitedAt }: { id: string; hasLogin
       {state?.message && <span className="text-sm text-ok">{state.message}</span>}
       {state?.error && <span className="text-sm text-danger">{state.error}</span>}
     </form>
+  );
+}
+
+export function InviteLinkPanel({ id, email, hasLogin }: { id: string; email: string; hasLogin: boolean }) {
+  const [state, action, pending] = useActionState(createInviteLink, null);
+  const [copied, setCopied] = useState(false);
+  const link = state?.message?.startsWith("http") ? state.message : null;
+  return (
+    <Card>
+      <CardHeader title={hasLogin ? "Password reset link" : "Invite link"}
+        subtitle={`Create a secure link and send it to ${email} yourself (Slack, text or email). They'll choose their own password. No email is sent by the app.`} />
+      <div className="space-y-3 px-5 pb-5">
+        <form action={action}>
+          <input type="hidden" name="id" value={id} />
+          <Button disabled={pending}>{pending ? "Creating…" : link ? "Create a new link" : hasLogin ? "Create password reset link" : "Create invite link"}</Button>
+        </form>
+        {state?.error && <Alert tone="danger">{state.error}</Alert>}
+        {link && (
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <Input readOnly value={link} onFocus={(e) => e.currentTarget.select()} className="font-mono text-xs" />
+              <Button type="button" variant="secondary" onClick={async () => { await navigator.clipboard.writeText(link); setCopied(true); }}>
+                {copied ? "Copied ✓" : "Copy"}
+              </Button>
+            </div>
+            <p className="text-xs text-muted">Works once and expires after about an hour, so send it now. If it expires, just create a new one. Don&apos;t open it yourself; it would sign you in as them.</p>
+          </div>
+        )}
+      </div>
+    </Card>
   );
 }
 

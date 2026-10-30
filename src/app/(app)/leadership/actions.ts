@@ -208,6 +208,32 @@ async function invite(employeeId: string) {
   check(await supabase.rpc("admin_mark_invited", { emp: p.id }));
 }
 
+/**
+ * Generate a single-use sign-in link without sending any email, so an admin can
+ * share it over Slack/text. New people get an invite link; existing logins get a
+ * password-reset link. Either lands on "Choose a password".
+ */
+export async function createInviteLink(_: ActionResult, f: FormData): Promise<ActionResult> {
+  return attempt(async () => {
+    await requireAdmin();
+    const supabase = await createClient();
+    const { data: p } = await supabase.from("employee_profiles").select("id, work_email, user_id, status").eq("id", str(f, "id")).single();
+    if (!p) throw new Error("Employee not found");
+    if (p.status !== "active") throw new Error("Reactivate this employee first");
+    const redirectTo = `${await siteUrl()}/auth/confirm?next=/auth/set-password`;
+    const admin = createAdminClient();
+    const { data, error } = await admin.auth.admin.generateLink({
+      type: p.user_id ? "recovery" : "invite",
+      email: p.work_email,
+      options: { redirectTo },
+    });
+    if (error) throw error;
+    check(await supabase.rpc("admin_mark_invited", { emp: p.id }));
+    revalidatePath(`/leadership/employees/${p.id}`);
+    return data.properties.action_link;
+  });
+}
+
 export async function inviteEmployee(_: ActionResult, f: FormData): Promise<ActionResult> {
   return attempt(async () => {
     await invite(str(f, "id"));
