@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSettings } from "@/lib/data";
 import { ActionForm, SubmitButton } from "@/components/forms";
 import { Card, CardHeader, LinkButton, PageHeader } from "@/components/ui";
-import { AgencyForm, ApproverRow, ImportForm, InviteAllButton } from "@/components/settings-forms";
+import { AgencyForm, ApproverRow, ImportForm } from "@/components/settings-forms";
 import { saveSettings } from "../actions";
 import { cn } from "@/lib/format";
 
@@ -59,8 +59,16 @@ export default async function SetupPage() {
           <div className="divide-y divide-line">{list.map((e) => <ApproverRow key={e.id} e={e} people={list} />)}</div>
         </Step>
         <Step n={4} title="Invite employees">
-          <p className="mb-3 text-sm text-muted">Each person gets a secure, single-use link to set their password. You can also invite people one at a time from their profile.</p>
-          <InviteAllButton count={notInvited} />
+          <p className="mb-3 text-sm text-muted">Open each person below, click <strong>Create invite link</strong>, and send them the link (Slack, text or email). They choose their own password.</p>
+          <ul className="divide-y divide-line text-sm">
+            {list.filter((p) => !p.user_id).map((p) => (
+              <li key={p.id} className="flex items-center justify-between py-2">
+                <span>{p.full_name}</span>
+                <Link href={`/leadership/employees/${p.id}`} className="font-medium underline-offset-4 hover:underline">{p.invited_at ? "Link created, not signed in yet" : "Create invite link"} →</Link>
+              </li>
+            ))}
+            {!list.some((p) => !p.user_id) && <li className="py-2 text-muted">Everyone has signed in. 🎉</li>}
+          </ul>
         </Step>
         <Step n={5} title="Launch">
           {s.onboarding_completed ? <p className="text-sm text-ok">You&apos;re live. 🎉</p> : (

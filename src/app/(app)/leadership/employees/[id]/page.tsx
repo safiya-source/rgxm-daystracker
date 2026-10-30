@@ -5,7 +5,7 @@ import { getToday } from "@/lib/data";
 import { Alert, Card, CardHeader, LinkButton, PageHeader, Table, td, th } from "@/components/ui";
 import { ProfileView } from "@/components/profile-view";
 import { Ledger } from "@/components/ledger";
-import { AdjustForm, EntitlementForm, InviteButton, InviteLinkPanel, SelfApprovalToggle, StatusButton } from "@/components/admin-employee-panels";
+import { AdjustForm, EntitlementForm, InviteLinkPanel, SelfApprovalToggle, StatusButton } from "@/components/admin-employee-panels";
 import { formatDate } from "@/lib/rules/dates";
 import { formatDays, ROLE_LABEL } from "@/lib/format";
 
@@ -33,7 +33,6 @@ export default async function EmployeeAdminPage({ params, searchParams }: { para
       <PageHeader title={p.full_name} subtitle={`${p.job_title ?? ""}${p.department ? " · " + p.department : ""}`}
         action={<>
           <LinkButton href={`/leadership/employees/${id}/edit`} variant="secondary">Edit details</LinkButton>
-          {p.status === "active" && <InviteButton id={id} hasLogin={!!p.user_id} invitedAt={p.invited_at} />}
           <StatusButton id={id} status={p.status} />
         </>} />
       {saved && <Alert tone="ok" className="mb-5">Saved.</Alert>}

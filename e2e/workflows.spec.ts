@@ -125,13 +125,18 @@ test("admin shares an invite link; the new person sets a password and signs in",
 
   await page.getByRole("button", { name: "Create invite link" }).click();
   const linkBox = page.locator("input[readonly]");
-  await expect(linkBox).toHaveValue(/^http.*verify/);
+  await expect(linkBox).toHaveValue(/\/auth\/confirm\?token_hash=/);
   const link = await linkBox.inputValue();
 
-  // The new person opens the link in their own browser.
+  // A link-preview bot (Slack/WhatsApp) fetching the URL must not use it up.
+  const bot = await page.request.get(link);
+  expect(bot.status()).toBe(200);
+
+  // The new person opens the link in their own browser and clicks Continue.
   const theirs = await browser.newContext();
   const p2 = await theirs.newPage();
-  await p2.goto(link);
+  await p2.goto(link, { waitUntil: "networkidle" });
+  await p2.getByRole("button", { name: "Continue" }).click();
   await p2.waitForURL(/auth\/set-password/, { timeout: 30_000 });
   await p2.waitForLoadState("networkidle");
   await p2.fill("input[name=password]", "nina-secret-pass-1");
@@ -148,4 +153,16 @@ test("admin shares an invite link; the new person sets a password and signs in",
   await p2.click("button[type=submit]");
   await p2.waitForURL(/dashboard/);
   await theirs.close();
+
+  // Forgot their password? The same box now creates a reset link.
+  await page.reload({ waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Create password reset link" }).click();
+  await expect(linkBox).toHaveValue(/type=recovery/);
+  const reset = await linkBox.inputValue();
+  const again = await browser.newContext();
+  const p3 = await again.newPage();
+  await p3.goto(reset, { waitUntil: "networkidle" });
+  await p3.getByRole("button", { name: "Continue" }).click();
+  await p3.waitForURL(/auth\/set-password/);
+  await again.close();
 });

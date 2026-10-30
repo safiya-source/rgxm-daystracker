@@ -220,17 +220,16 @@ export async function createInviteLink(_: ActionResult, f: FormData): Promise<Ac
     const { data: p } = await supabase.from("employee_profiles").select("id, work_email, user_id, status").eq("id", str(f, "id")).single();
     if (!p) throw new Error("Employee not found");
     if (p.status !== "active") throw new Error("Reactivate this employee first");
-    const redirectTo = `${await siteUrl()}/auth/confirm?next=/auth/set-password`;
-    const admin = createAdminClient();
-    const { data, error } = await admin.auth.admin.generateLink({
+    const { data, error } = await createAdminClient().auth.admin.generateLink({
       type: p.user_id ? "recovery" : "invite",
       email: p.work_email,
-      options: { redirectTo },
     });
     if (error) throw error;
     check(await supabase.rpc("admin_mark_invited", { emp: p.id }));
     revalidatePath(`/leadership/employees/${p.id}`);
-    return data.properties.action_link;
+    // Link to our own page (not Supabase's verify URL) so previews can't consume it.
+    const q = new URLSearchParams({ token_hash: data.properties.hashed_token, type: p.user_id ? "recovery" : "invite", next: "/auth/set-password" });
+    return `${await siteUrl()}/auth/confirm?${q}`;
   });
 }
 
